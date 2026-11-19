@@ -1,0 +1,30 @@
+<runner>
+    runners_dir=$(cd -- "$(dirname -- "${COMPI_RUNNERS_FILE}")" &amp;&amp; pwd)
+    module_dir="${runners_dir}/generic-env-runner"
+
+    if [ -f "${module_dir}/conda-envs.env" ]; then
+        . "${module_dir}/conda-envs.env"
+    fi
+    if [ -f "${module_dir}/docker.env" ]; then
+        . "${module_dir}/docker.env"
+    fi
+
+    task_key="${task_id//[^a-zA-Z0-9_]/_}"
+    conda_env_var="${task_key}_conda_env"
+    docker_image_var="${task_key}_image"
+    conda_env="${!conda_env_var}"
+    docker_image="${!docker_image_var}"
+
+    if [ -n "${conda_env}" ] &amp;&amp; [ -n "${docker_image}" ]; then
+        echo "[runner] ERROR: task '${task_id}' has both conda and docker configured." >&amp;2
+        exit 1
+    fi
+
+    if [ -n "${conda_env}" ]; then
+        /bin/bash "${module_dir}/runner_conda.sh" "${conda_env}" "${task_code}"
+    elif [ -n "${docker_image}" ]; then
+        /bin/bash "${module_dir}/runner_docker.sh" "${docker_image}" "${task_code}"
+    else
+        /bin/bash -c "${task_code}"
+    fi
+</runner>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pipeline xmlns="http://www.sing-group.org/compi/pipeline-1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <version>1.0</version>
+    <params>
+        <param name="workingDir" shortName="w" global="true">Working directory.</param>
+        <param name="dockerMsg" shortName="m" global="true" defaultValue="hola desde docker">Mensaje de prueba para la tarea Docker.</param>
+    </params>
+    <tasks>
+        <task id="task-conda">
+            echo "[task-conda] python: $(which python)"
+            python -c "import sys; print('Python', sys.version.split()[0])"
+            echo "Ejecutado dentro del entorno conda" > ${workingDir}/conda-output.txt
+        </task>
+        <task id="task-docker" after="task-conda">
+            echo "[task-docker] contenedor: $(head -n 1 /etc/os-release)"
+            echo "[task-docker] dockerMsg: ${dockerMsg}"
+            echo "Ejecutado dentro de Docker" > ${workingDir}/docker-output.txt
+        </task>
+        <task id="task-bash" after="task-docker">
+            echo "[task-bash] bash: $BASH_VERSION"
+            echo "Ejecutado con bash, sin entorno conda" > ${workingDir}/bash-output.txt
+            cat ${workingDir}/conda-output.txt
+            cat ${workingDir}/docker-output.txt
+        </task>
+    </tasks>
+</pipeline>

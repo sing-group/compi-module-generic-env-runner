@@ -1,0 +1,5 @@
+{
+    "name": "generic-env-runner",
+    "description": "generic runner for executing pipeline tasks in conda environments, Docker images, or bash",
+    "version": "1.0.0"
+}
