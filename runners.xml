@@ -12,8 +12,10 @@
     task_key="${task_id//[^a-zA-Z0-9_]/_}"
     conda_env_var="${task_key}_conda_env"
     docker_image_var="${task_key}_image"
+    docker_shell_var="${task_key}_shell"
     conda_env="${!conda_env_var}"
     docker_image="${!docker_image_var}"
+    docker_shell="${!docker_shell_var:-/bin/bash}"
 
     if [ -n "${conda_env}" ] &amp;&amp; [ -n "${docker_image}" ]; then
         echo "[runner] ERROR: task '${task_id}' has both conda and docker configured." >&amp;2
@@ -23,7 +25,7 @@
     if [ -n "${conda_env}" ]; then
         /bin/bash "${module_dir}/runner_conda.sh" "${conda_env}" "${task_code}"
     elif [ -n "${docker_image}" ]; then
-        /bin/bash "${module_dir}/runner_docker.sh" "${docker_image}" "${task_code}"
+        /bin/bash "${module_dir}/runner_docker.sh" "${docker_image}" "${task_code}" "${docker_shell}"
     else
         /bin/bash -c "${task_code}"
     fi

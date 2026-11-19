@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
-# Usage: runner_docker.sh <docker_image> <task_code>
+# Usage: runner_docker.sh <docker_image> <task_code> [shell]
 #
-# Runs <task_code> with bash inside <docker_image>.
+# Runs <task_code> with the given shell inside <docker_image>. The shell
+# defaults to /bin/bash.
 #
 # - Variables listed in $task_params are passed to the container with -e.
 # - Variables named docker_mount_<name> defined in docker.env are mounted with
@@ -13,13 +14,14 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <docker_image> <task_code>" >&2
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+    echo "Usage: $0 <docker_image> <task_code> [shell]" >&2
     exit 2
 fi
 
 docker_image="$1"
 task_code="$2"
+docker_shell="${3:-/bin/bash}"
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -97,4 +99,4 @@ for var in ${!docker_mount_@}; do
 done
 
 exec docker run --rm --pull=never "${env_args[@]}" "${mount_args[@]}" \
-    --entrypoint /bin/bash "${docker_image}" -c "${task_code}"
+    --entrypoint "${docker_shell}" "${docker_image}" -c "${task_code}"

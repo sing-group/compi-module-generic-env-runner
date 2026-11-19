@@ -67,7 +67,7 @@ For a fixed version, use a tag instead:
 
 ```bash
 compi-dk add-module --url \
-  https://github.com/sing-group/compi-module-generic-env-runner/archive/refs/tags/1.0.0.zip
+  https://github.com/sing-group/compi-module-generic-env-runner/archive/refs/tags/1.1.0.zip
 ```
 
 The module appends its runner to the project runners file and installs:
@@ -133,6 +133,19 @@ Example:
 
 ```bash
 task_align_image=pegi3s/clustalomega:latest
+```
+
+The shell used inside the container defaults to `/bin/bash`. It can be changed
+per task:
+
+```bash
+<normalized_task_id>_shell=<shell>
+```
+
+Example:
+
+```bash
+task_align_shell=/bin/sh
 ```
 
 Mount paths are declared with variables named `docker_mount_<name>`:
